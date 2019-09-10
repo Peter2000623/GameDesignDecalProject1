@@ -15,11 +15,23 @@ public class EnemyController : MonoBehaviour
 
     [SerializeField]
     [Tooltip("Approximate ampount of damage dealth per frame")]
-    private int m_Damage;
+    private float m_Damage;
 
     [SerializeField]
     [Tooltip("The explosion that occurs when this enemy dies.")]
     private ParticleSystem m_DeathExplosion;
+
+    [SerializeField]
+    [Tooltip("The probability that this enemy drops a health pill")]
+    private float m_HealthPillDropRate;
+
+    [SerializeField]
+    [Tooltip("The type of health pill this enemy drops")]
+    private GameObject m_HealthPill;
+
+    [SerializeField]
+    [Tooltip("How many points killing this enemy provides")]
+    private int m_Score;
     #endregion
 
     #region Private Variables
@@ -74,8 +86,17 @@ public class EnemyController : MonoBehaviour
     #region Health Methods
     public void DecreaseHealth(float amount)
     {
-        Instantiate(m_DeathExplosion, transform.position, Quaternion.identity);
-        Destroy(gameObject);
+        p_curHealth -= amount;
+        if(p_curHealth <= 0)
+        {
+            ScoreManager.singleton.IncreaseScore(m_Score);
+            if (Random.value < m_HealthPillDropRate)
+            {
+                Instantiate(m_HealthPill, transform.position, Quaternion.identity);
+            }
+            Instantiate(m_DeathExplosion, transform.position, Quaternion.identity);
+            Destroy(gameObject);
+        }
     }
     #endregion
 }
